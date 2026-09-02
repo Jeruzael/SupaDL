@@ -6,16 +6,19 @@ bounded concurrency, observable behavior, and a responsive desktop interface.
 
 ## Current status
 
-Milestone M0 is the current implementation boundary. This repository contains:
+Milestone M0 is complete, and the first M1 foundation slice is implemented. This repository
+contains:
 
 - the installable `src/` package and command-line smoke entry point;
 - typed settings and safe platform-specific application paths;
 - structured JSON logging with centralized secret redaction;
+- immutable domain models, typed errors, and a centralized lifecycle transition policy;
+- safe filename extraction, sanitization, truncation, and collision-name generation;
 - Ruff, mypy, pytest, and pytest-asyncio configuration; and
 - the product plan, security baseline, architecture, and detailed acceptance criteria.
 
-The HTTP transfer engine, SQLite persistence, queue, and PySide6 interface are later
-milestones and are not implemented yet.
+The HTTP client, probe service, transfer worker, SQLite persistence, queue, and PySide6
+interface are not implemented yet.
 
 ## Requirements
 
@@ -71,6 +74,11 @@ directory creation.
 Settings are JSON-serializable and can be saved atomically. The current defaults are
 documented in `src/supadl/config/settings.py` and validated before use.
 
+Domain task, source, progress, segment, checksum, retry, and error models serialize to
+storage-friendly primitives. Filename resolution prefers a valid Content-Disposition
+`filename*`/`filename`, then the URL path, then a safe fallback. It never treats the result
+as a destination path.
+
 ## Security and content policy
 
 SupaDL is for files the user is authorized to download. It will not implement DRM,
@@ -83,8 +91,7 @@ See [Security](docs/security.md) and the
 
 ## Known M0 limitations
 
-- There is no downloader, database, queue, desktop UI, or browser integration yet.
+- There is no HTTP client/downloader, database, queue, desktop UI, or browser integration yet.
 - The public product license is not selected; the repository is currently all rights
   reserved.
 - Windows packaging and clean-machine verification are scheduled for M6.
-

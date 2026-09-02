@@ -28,11 +28,16 @@ Presentation / CLI / future integrations
   not own transfer logic.
 - **Integrations:** browser, resolver/plugin, and media boundaries. These are deferred.
 
-## M0 implementation
+## Implemented foundation
 
 M0 contains only package bootstrapping, the CLI smoke entry point, typed configuration,
 path resolution, and structured logging. It has no network, database, background-worker, or
 GUI side effects at import time.
+
+The first M1 slice adds pure domain models and lifecycle policy under `supadl.domain`, plus
+safe filename utilities under `supadl.storage`. Domain code imports neither storage nor any
+HTTP, Qt, or database implementation. Filename extraction is also independent of network and
+filesystem mutation so the future probe service can supply untrusted metadata safely.
 
 ## Dependency lifecycle
 
@@ -45,4 +50,3 @@ prohibited.
 Architecture decision records listed in the master plan will be added when their respective
 implementation boundary is reached. ADR-001 through ADR-004 should be resolved before the
 corresponding M1/M2 work is accepted.
-

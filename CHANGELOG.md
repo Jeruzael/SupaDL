@@ -15,4 +15,8 @@ approved.
 - Structured JSON logging with header, URL, context, message, and exception redaction.
 - Ruff, mypy, pytest, and pytest-asyncio development configuration.
 - Architecture, security, state-machine, contribution, and acceptance-criteria documents.
-
+- Immutable domain enums, task/source/segment/progress/checksum/retry/error models, and typed
+  validation errors.
+- Central legal-state transition policy with UTC lifecycle timestamp handling.
+- RFC 5987-aware Content-Disposition filename extraction, URL fallback, Windows-safe
+  sanitization, length enforcement, and deterministic collision naming.
