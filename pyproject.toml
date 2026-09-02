@@ -21,7 +21,9 @@ classifiers = [
   "Programming Language :: Python :: 3.14",
   "Typing :: Typed",
 ]
-dependencies = []
+dependencies = [
+  "httpx[http2]>=0.28.1,<0.29",
+]
 
 [project.optional-dependencies]
 dev = [

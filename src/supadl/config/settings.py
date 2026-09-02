@@ -8,6 +8,7 @@ import platform
 import tempfile
 from collections.abc import Mapping
 from dataclasses import asdict, dataclass, fields, replace
+from math import isfinite
 from pathlib import Path
 from typing import Any, Final, Self
 
@@ -223,7 +224,7 @@ class DownloadSettings:
     def _validate_seconds(name: str, value: float) -> None:
         if isinstance(value, bool) or not isinstance(value, (int, float)):
             raise SettingsError(f"{name} must be numeric")
-        if not 0 < float(value) <= 3600:
+        if not isfinite(value) or not 0 < float(value) <= 3600:
             raise SettingsError(f"{name} must be greater than 0 and at most 3600 seconds")
 
     @classmethod

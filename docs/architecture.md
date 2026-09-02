@@ -34,19 +34,25 @@ M0 contains only package bootstrapping, the CLI smoke entry point, typed configu
 path resolution, and structured logging. It has no network, database, background-worker, or
 GUI side effects at import time.
 
-The first M1 slice adds pure domain models and lifecycle policy under `supadl.domain`, plus
+The first M1 slices add pure domain models and lifecycle policy under `supadl.domain`, plus
 safe filename utilities under `supadl.storage`. Domain code imports neither storage nor any
 HTTP, Qt, or database implementation. Filename extraction is also independent of network and
-filesystem mutation so the future probe service can supply untrusted metadata safely.
+filesystem mutation so the probe service can supply untrusted metadata safely.
+
+`supadl.transfer` owns HTTP infrastructure. Its factory creates configured `httpx.AsyncClient`
+instances, while the caller owns their lifetime. The probe service receives a client through
+constructor injection, streams only response headers, validates every outbound redirect URL,
+and returns immutable serialization-ready metadata. No client or network task is created at
+module import time.
 
 ## Dependency lifecycle
 
-Future HTTP clients, database connections, file handles, and asynchronous workers must have
+HTTP clients, future database connections, file handles, and asynchronous workers must have
 an explicit owner and clean close path. Global clients and network access during import are
-prohibited.
+prohibited. HTTPX's connection limit is a defensive global bound; per-host scheduling remains
+the responsibility of the future queue/coordinator in SUP-403.
 
 ## Planned decisions
 
-Architecture decision records listed in the master plan will be added when their respective
-implementation boundary is reached. ADR-001 through ADR-004 should be resolved before the
-corresponding M1/M2 work is accepted.
+ADR-003 records the accepted HTTPX transport and lifecycle boundary. Other planned records
+will be added when their implementation boundaries are reached.

@@ -12,12 +12,17 @@
   device names are neutralized.
 - Filename length limits preserve extensions where possible, and deterministic collision
   names do not inspect or mutate the filesystem.
-- No network, database, shell, or downloaded-file execution occurs in M0.
-- The package has no third-party runtime dependencies in M0.
+- HTTP clients explicitly enable TLS verification, disable implicit environment proxy/netrc
+  behavior, declare a user agent, request identity encoding, and bound every timeout and
+  redirect chain.
+- Initial and redirected URLs are revalidated before each request; unsupported schemes and
+  embedded credentials are rejected before transmission.
+- Probe responses are streamed and closed without retaining the response body.
+- No database, shell, or downloaded-file execution occurs in the implemented slices.
 
 ## Mandatory future controls
 
-- TLS verification remains enabled; certificate errors are never bypassed as a workaround.
+- TLS certificate errors are never bypassed as a workaround.
 - Server-provided filenames are untrusted basenames and cannot select a destination path.
 - Existing user files are never silently overwritten.
 - Authorization, cookies, tokens, signed query data, and credentials are never stored in

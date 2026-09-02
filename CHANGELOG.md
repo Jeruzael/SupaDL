@@ -20,3 +20,9 @@ approved.
 - Central legal-state transition policy with UTC lifecycle timestamp handling.
 - RFC 5987-aware Content-Disposition filename extraction, URL fallback, Windows-safe
   sanitization, length enforcement, and deterministic collision naming.
+- Explicitly owned HTTPX client construction with HTTP/2, TLS verification, bounded
+  redirects, four-way timeouts, identity encoding, and outbound URL validation.
+- Streamed metadata probing with `HEAD` and minimal `GET` fallbacks, demonstrated range
+  support, typed HTTP/transport failures, and safe filename resolution.
+- A deterministic local HTTP fixture matrix covering redirects, rejected `HEAD`, rejected or
+  misleading ranges, unknown length, lifecycle closure, status mapping, and URL revalidation.

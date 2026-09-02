@@ -74,7 +74,7 @@ def _validate_http_url(value: str, *, field_name: str) -> str:
 
 @dataclass(frozen=True, slots=True)
 class DownloadSource:
-    """Original URL and metadata discovered by a future probe service."""
+    """Original URL and metadata discovered by the probe service."""
 
     original_url: str
     final_url: str | None = None

@@ -155,6 +155,7 @@ def test_default_settings_match_documented_concurrency(tmp_path: Path) -> None:
         ("checkpoint_bytes", 0),
         ("maximum_filename_length", 31),
         ("connect_timeout_seconds", 0),
+        ("connect_timeout_seconds", float("nan")),
         ("read_timeout_seconds", 3601),
     ],
 )

@@ -18,6 +18,7 @@ class ErrorCode(Enum):
     CONNECT_TIMEOUT = "connect_timeout"
     READ_TIMEOUT = "read_timeout"
     TLS_ERROR = "tls_error"
+    REDIRECT_LIMIT_EXCEEDED = "redirect_limit_exceeded"
     HTTP_CLIENT_ERROR = "http_client_error"
     HTTP_SERVER_ERROR = "http_server_error"
     UNAUTHORIZED = "unauthorized"
