@@ -10,10 +10,12 @@ from supadl.storage.filenames import (
     resolve_filename,
     sanitize_filename,
 )
+from supadl.storage.writer import PartialFileWriter
 
 __all__ = [
     "DEFAULT_FILENAME",
     "DEFAULT_MAXIMUM_FILENAME_LENGTH",
+    "PartialFileWriter",
     "collision_filename",
     "filename_from_content_disposition",
     "filename_from_url",

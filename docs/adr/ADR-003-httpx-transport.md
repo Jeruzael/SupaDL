@@ -22,7 +22,9 @@ initial and redirected request URL is revalidated before transmission.
 The constructing application scope owns each client and closes it explicitly or through an
 async context manager. Services receive the client through constructor injection and do not
 close a client they did not create. Probe responses use streaming contexts and close without
-buffering the resource body.
+buffering the resource body. Transfer workers use the same streaming API and iterate raw
+bytes with an explicit chunk bound so content decoding cannot silently change the validated
+representation.
 
 ## Consequences
 

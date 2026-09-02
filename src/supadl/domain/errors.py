@@ -27,9 +27,11 @@ class ErrorCode(Enum):
     RATE_LIMITED = "rate_limited"
     RANGE_UNSUPPORTED = "range_unsupported"
     SOURCE_CHANGED = "source_changed"
+    CONTENT_LENGTH_MISMATCH = "content_length_mismatch"
     DISK_FULL = "disk_full"
     PERMISSION_DENIED = "permission_denied"
     FILE_CONFLICT = "file_conflict"
+    FILE_WRITE_ERROR = "file_write_error"
     CHECKSUM_MISMATCH = "checksum_mismatch"
     CANCELLED_BY_USER = "cancelled_by_user"
 

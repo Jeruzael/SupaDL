@@ -45,6 +45,12 @@ constructor injection, streams only response headers, validates every outbound r
 and returns immutable serialization-ready metadata. No client or network task is created at
 module import time.
 
+The single-stream worker receives the same owned client plus a `PartialFileWriter`. The
+writer constrains new `.part` files to one existing application-owned root and opens them
+exclusively. The worker consumes raw response bytes in bounded chunks, validates the final
+URL, validators, content encoding, and known length, then durably flushes the partial file.
+It deliberately does not finalize, persist, retry, emit UI progress, or own cancellation yet.
+
 ## Dependency lifecycle
 
 HTTP clients, future database connections, file handles, and asynchronous workers must have

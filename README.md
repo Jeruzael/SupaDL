@@ -6,7 +6,7 @@ bounded concurrency, observable behavior, and a responsive desktop interface.
 
 ## Current status
 
-Milestone M0 and the first four M1 slices are implemented. This repository
+Milestone M0 and the first five M1 slices are implemented. This repository
 contains:
 
 - the installable `src/` package and command-line smoke entry point;
@@ -18,11 +18,13 @@ contains:
   HTTP/2 support, TLS verification, and redirect URL validation;
 - a streamed metadata probe with `HEAD` fallback, real byte-range verification, typed
   failures, and safe filename resolution;
+- a bounded single-stream worker that writes exclusively to contained `.part` files,
+  validates response identity and length, and calculates SHA-256 incrementally;
 - Ruff, mypy, pytest, and pytest-asyncio configuration; and
 - the product plan, security baseline, architecture, and detailed acceptance criteria.
 
-The transfer worker, partial-file writer, SQLite persistence, queue, and PySide6 interface
-are not implemented yet.
+Cancellation controls, progress events, finalization, SQLite persistence, the queue, and the
+PySide6 interface are not implemented yet.
 
 ## Requirements
 
@@ -88,6 +90,11 @@ client and must close it or use it as an async context manager. `ProbeService` a
 client through its constructor and returns serializable source metadata without buffering a
 response body.
 
+`SingleStreamWorker` accepts a probed `DownloadSource` and a `PartialFileWriter`. It streams
+raw response bytes in bounded chunks to a new application-owned `.part` path, refuses to
+overwrite an existing partial, and returns the byte count and SHA-256 only after response and
+file validation. It does not expose or replace a final destination file.
+
 ## Security and content policy
 
 SupaDL is for files the user is authorized to download. It will not implement DRM,
@@ -100,8 +107,8 @@ See [Security](docs/security.md) and the
 
 ## Known limitations
 
-- Probing is implemented, but there is no byte-transfer worker, database, queue, desktop UI,
-  or browser integration yet.
+- Fresh single-stream transfer is implemented, but cancellation, progress events, resume,
+  retries, finalization, database, queue, desktop UI, and browser integration are not.
 - Probe results are serialization-ready but will not survive process restart until SUP-201
   introduces SQLite persistence.
 - The public product license is not selected; the repository is currently all rights

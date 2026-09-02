@@ -26,3 +26,7 @@ approved.
   support, typed HTTP/transport failures, and safe filename resolution.
 - A deterministic local HTTP fixture matrix covering redirects, rejected `HEAD`, rejected or
   misleading ranges, unknown length, lifecycle closure, status mapping, and URL revalidation.
+- Contained exclusive partial-file writing and a bounded raw single-stream worker with
+  incremental SHA-256, durable flush, source-validator checks, and exact length enforcement.
+- Single-stream fixture coverage for exact bytes/hash, unknown and zero lengths, early EOF,
+  excess data, transformed or changed sources, conflicts, containment, and failure cleanup.

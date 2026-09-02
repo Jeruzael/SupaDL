@@ -18,6 +18,11 @@
 - Initial and redirected URLs are revalidated before each request; unsupported schemes and
   embedded credentials are rejected before transmission.
 - Probe responses are streamed and closed without retaining the response body.
+- Fresh transfers write only to exclusively created `.part` files inside a resolved
+  application-owned temporary root. Existing partials and paths outside that root are
+  rejected without overwrite.
+- Transfer responses use raw bounded chunks and must match the probed final URL, known
+  validators, identity encoding, and expected byte length before success is returned.
 - No database, shell, or downloaded-file execution occurs in the implemented slices.
 
 ## Mandatory future controls
@@ -25,6 +30,8 @@
 - TLS certificate errors are never bypassed as a workaround.
 - Server-provided filenames are untrusted basenames and cannot select a destination path.
 - Existing user files are never silently overwritten.
+- Partial files are not promoted to final destinations until the later finalization and
+  checksum policies accept them.
 - Authorization, cookies, tokens, signed query data, and credentials are never stored in
   normal logs.
 - External programs use argument arrays and never `shell=True`.

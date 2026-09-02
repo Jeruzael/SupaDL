@@ -3,15 +3,14 @@
 from __future__ import annotations
 
 import re
-import socket
-import ssl
 from dataclasses import dataclass
 from typing import Final
 
 import httpx
 
-from supadl.domain import DownloadSource, ErrorCode, SupaDLError
+from supadl.domain import DownloadSource
 from supadl.storage import DEFAULT_MAXIMUM_FILENAME_LENGTH, resolve_filename
+from supadl.transfer.errors import http_status_error, map_transport_error
 
 _CONTENT_RANGE_PATTERN: Final = re.compile(
     r"bytes\s+(?P<start>\d+)-(?P<end>\d+)/(?P<total>\d+)",
@@ -87,58 +86,6 @@ def _range_total(response: _ResponseMetadata) -> int | None:
     return total
 
 
-def _iter_exception_chain(error: BaseException) -> tuple[BaseException, ...]:
-    chain: list[BaseException] = []
-    current: BaseException | None = error
-    while current is not None and current not in chain:
-        chain.append(current)
-        current = current.__cause__ or current.__context__
-    return tuple(chain)
-
-
-def _map_transport_error(error: httpx.HTTPError) -> SupaDLError:
-    if isinstance(error, httpx.TooManyRedirects):
-        return SupaDLError(
-            "the server exceeded the configured redirect limit",
-            code=ErrorCode.REDIRECT_LIMIT_EXCEEDED,
-        )
-    if isinstance(error, (httpx.ConnectTimeout, httpx.PoolTimeout)):
-        return SupaDLError("the connection timed out", code=ErrorCode.CONNECT_TIMEOUT)
-    if isinstance(error, httpx.ReadTimeout):
-        return SupaDLError("the server response timed out", code=ErrorCode.READ_TIMEOUT)
-
-    chain = _iter_exception_chain(error)
-    if any(isinstance(item, ssl.SSLError) for item in chain):
-        return SupaDLError("TLS certificate validation failed", code=ErrorCode.TLS_ERROR)
-    if any(isinstance(item, socket.gaierror) for item in chain):
-        return SupaDLError("the server name could not be resolved", code=ErrorCode.DNS_FAILURE)
-    if isinstance(error, httpx.NetworkError):
-        return SupaDLError("the server could not be reached", code=ErrorCode.NETWORK_UNAVAILABLE)
-    return SupaDLError("the HTTP request failed", code=ErrorCode.HTTP_CLIENT_ERROR)
-
-
-def _status_error(status_code: int) -> SupaDLError:
-    if status_code == 401:
-        return SupaDLError("the server requires authorization", code=ErrorCode.UNAUTHORIZED)
-    if status_code == 403:
-        return SupaDLError("the server denied access", code=ErrorCode.FORBIDDEN)
-    if status_code == 404:
-        return SupaDLError("the requested resource was not found", code=ErrorCode.NOT_FOUND)
-    if status_code == 429:
-        return SupaDLError("the server rate limit was reached", code=ErrorCode.RATE_LIMITED)
-    if 500 <= status_code <= 599:
-        return SupaDLError(
-            "the server could not complete the request",
-            code=ErrorCode.HTTP_SERVER_ERROR,
-            context={"status_code": status_code},
-        )
-    return SupaDLError(
-        "the server rejected the request",
-        code=ErrorCode.HTTP_CLIENT_ERROR,
-        context={"status_code": status_code},
-    )
-
-
 async def _request_metadata(
     client: httpx.AsyncClient,
     method: str,
@@ -159,7 +106,7 @@ async def _request_metadata(
                 headers=httpx.Headers(response.headers),
             )
     except httpx.HTTPError as error:
-        raise _map_transport_error(error) from error
+        raise map_transport_error(error) from error
 
 
 def _is_success(response: _ResponseMetadata) -> bool:
@@ -194,7 +141,7 @@ class ProbeService:
         metadata_response = range_response
         if not _is_success(range_response):
             if range_response.status_code not in _RANGE_REJECTION_STATUSES:
-                raise _status_error(range_response.status_code)
+                raise http_status_error(range_response.status_code)
             if _is_success(head):
                 metadata_response = head
             else:
@@ -205,7 +152,7 @@ class ProbeService:
                 )
 
         if not _is_success(metadata_response):
-            raise _status_error(metadata_response.status_code)
+            raise http_status_error(metadata_response.status_code)
 
         range_total = _range_total(range_response)
         head_length = _content_length(head.headers) if _is_success(head) else None
